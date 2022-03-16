@@ -45,5 +45,11 @@ namespace LrcParser
             lyrics.Sort(comparer);
             return lyrics;
         }
+
+        public static Lyric[] SortByTimestamp(this Lyric[] lyrics)
+        {
+            Array.Sort(lyrics, comparer);
+            return lyrics;
+        }
     }
 }
