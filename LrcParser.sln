@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30114.105
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LrcParser", "LrcParser\LrcParser.csproj", "{0E15DE0E-3887-4BE3-A15B-DCAD77C7C490}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LrcParser.Tests", "LrcParser.Tests\LrcParser.Tests.csproj", "{95537043-F8B6-4C25-A991-4345E040E3F7}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0E15DE0E-3887-4BE3-A15B-DCAD77C7C490}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0E15DE0E-3887-4BE3-A15B-DCAD77C7C490}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0E15DE0E-3887-4BE3-A15B-DCAD77C7C490}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0E15DE0E-3887-4BE3-A15B-DCAD77C7C490}.Release|Any CPU.Build.0 = Release|Any CPU
+		{95537043-F8B6-4C25-A991-4345E040E3F7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{95537043-F8B6-4C25-A991-4345E040E3F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{95537043-F8B6-4C25-A991-4345E040E3F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{95537043-F8B6-4C25-A991-4345E040E3F7}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
