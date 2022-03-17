@@ -9,14 +9,14 @@ namespace LrcParser
         public readonly TimeSpan Timestamp;
         public readonly string Content;
 
-        public Lyric(TimeSpan timestamp, string text)
+        public Lyric(TimeSpan timestamp, string content)
         {
             this.Timestamp = timestamp;
-            this.Content = text ?? string.Empty;
+            this.Content = content ?? string.Empty;
         }
 
-        public Lyric(int minutes, int seconds, int milliseconds, string text) :
-            this(new TimeSpan(0, 0, minutes, seconds, milliseconds), text)
+        public Lyric(int minutes, int seconds, int milliseconds, string content) :
+            this(new TimeSpan(0, 0, minutes, seconds, milliseconds), content)
         {
         }
 
@@ -31,7 +31,7 @@ namespace LrcParser
         public static bool IsEmpty(this Lyric lyric) => lyric.Timestamp == Lyric.Empty.Timestamp;
     }
 
-    public static class LyricListExtensions
+    public static class LyricArrayExtensions
     {
         private class LyricComparer : IComparer<Lyric>
         {
