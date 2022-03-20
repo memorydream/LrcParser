@@ -63,7 +63,7 @@ namespace LrcParser.Tests
             [05:11.98]\n
             [05:11.99]---Fin---\n";
 
-            var lyrics = LyricParser.Parse(lyricText);
+            var lyrics = new LyricParser().Parse(lyricText);
             Assert.Equal(54, lyrics.Count);
         }
     }

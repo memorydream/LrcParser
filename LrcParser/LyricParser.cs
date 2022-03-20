@@ -4,39 +4,28 @@ using System.IO;
 
 namespace LrcParser
 {
-    public static class LyricParser
+    public class LyricParser
     {
-        private struct LrcTimestampMatchItem
-        {
-            public int Index;
-            public char Char;
+        private readonly List<string> _timestampTemp = new List<string>();
+        private readonly Stack<(int, char)> _timestampMatchTemp = new Stack<(int, char)>();
 
-            public LrcTimestampMatchItem(int index, char c)
-            {
-                this.Index = index;
-                this.Char = c;
-            }
-        }
-
-        public static List<Lyric> Parse(string lyrics)
+        public List<Lyric> Parse(string lyrics, char eol = '\n')
         {
             if (string.IsNullOrEmpty(lyrics) || string.IsNullOrWhiteSpace(lyrics))
                 return null;
 
-            return Parse(lyrics.Split('\n'));
+            return Parse(lyrics.Split(eol));
         }
 
-        public static List<Lyric> Parse(StreamReader stream, bool isDispose = false)
+        public List<Lyric> Parse(StreamReader stream, bool isDispose = false)
         {
             if (stream is null)
                 return null;
 
             var result = new List<Lyric>();
-            var timestampTemp = new List<string>();
-            var timestampMatchTemp = new Stack<LrcTimestampMatchItem>();
 
             while (!stream.EndOfStream)
-                ParseSingleLine(stream.ReadLine(), result, timestampTemp, timestampMatchTemp);
+                ParseSingleLine(stream.ReadLine(), result, _timestampTemp, _timestampMatchTemp);
 
             if (isDispose)
                 stream.Dispose();
@@ -44,31 +33,29 @@ namespace LrcParser
             return result;
         }
 
-        public static List<Lyric> Parse(string[] lyrics)
+        public List<Lyric> Parse(string[] lyrics)
         {
             var result = new List<Lyric>(lyrics.Length);
-            var timestampTemp = new List<string>();
-            var timestampMatchTemp = new Stack<LrcTimestampMatchItem>();
 
             for (int i = 0; i < lyrics.Length; i++)
-                ParseSingleLine(lyrics[i], result, timestampTemp, timestampMatchTemp);
+                ParseSingleLine(lyrics[i], result, _timestampTemp, _timestampMatchTemp);
 
             return result;
         }
 
-        public static List<Lyric> ParseSingleLine(string lrc)
+        public List<Lyric> ParseSingleLine(string lrc)
         {
             var result = new List<Lyric>();
             ParseSingleLine(lrc, result);
             return result.Count == 0 ? null : result;
         }
 
-        public static int ParseSingleLine(string lrc, List<Lyric> lyrics)
+        public int ParseSingleLine(string lrc, List<Lyric> lyrics)
         {
-            return ParseSingleLine(lrc, lyrics, new List<string>(), new Stack<LrcTimestampMatchItem>());
+            return ParseSingleLine(lrc, lyrics, _timestampTemp, _timestampMatchTemp);
         }
 
-        private static int ParseSingleLine(string lrc, List<Lyric> lyrics, List<string> timestampTemp, Stack<LrcTimestampMatchItem> timestampMatchTemp)
+        private static int ParseSingleLine(string lrc, List<Lyric> lyrics, List<string> timestampTemp, Stack<(int, char)> timestampMatchTemp)
         {
             if (lyrics is null || string.IsNullOrEmpty(lrc) || string.IsNullOrWhiteSpace(lrc))
                 return 0;
@@ -81,7 +68,7 @@ namespace LrcParser
             if (lrc[0] != '[' || lrc.Length < 8)  //min length format: [0:0.0]
                 return 0;
 
-            timestampMatchTemp.Push(new LrcTimestampMatchItem(0, '['));
+            timestampMatchTemp.Push((0, '['));
 
             int length = lrc.Length;
             bool hasContent = false;
@@ -90,22 +77,22 @@ namespace LrcParser
             {
                 if (lrc[i] == '[' && timestampMatchTemp.Count == 0)
                 {
-                    timestampMatchTemp.Push(new LrcTimestampMatchItem(i, '['));
+                    timestampMatchTemp.Push((i, '['));
                 }
                 else if (lrc[i] == ']')
                 {
-                    var item = timestampMatchTemp.Pop();
-                    if (item.Char != '[')
+                    var (index, c) = timestampMatchTemp.Pop();
+                    if (c != '[')
                         continue;
 
-                    var s = lrc.Substring(item.Index + 1, i - item.Index - 1);
+                    var s = lrc.Substring(index + 1, i - index - 1);
                     if (IsTimestamp(s))
                     {
                         timestampTemp.Add(s);
                     }
                     else
                     {
-                        lrc = ExtractLyricContent(lrc, item.Index);
+                        lrc = ExtractLyricContent(lrc, index);
                         hasContent = true;
                         break;
                     }
@@ -133,18 +120,32 @@ namespace LrcParser
 
         }
 
-        private static TimeSpan ParseTimestamp(string timestampStr)
+        private static TimeSpan ParseTimestamp(string timestamp)
         {
-            int index1 = timestampStr.IndexOf(':');
-            int index2 = timestampStr.IndexOf('.');
+            int index1 = timestamp.IndexOf(':');
+            int index2 = timestamp.IndexOf('.');
 
-            int min = index1 > 0 && int.TryParse(timestampStr.Substring(0, index1), out int m) ? m : 0;
-            int sec = index2 > 0 && index2 > index1
-                ? int.TryParse(timestampStr.Substring(index1 + 1, index2 - index1 - 1), out int s) ? s : 0
-                : int.TryParse(timestampStr.Substring(index1 + 1, timestampStr.Length - index1 - 1), out s) ? s : 0;
-            int ms  = index2 > 0 && int.TryParse(timestampStr.Substring(index2 + 1, timestampStr.Length - index2 - 1), out int l) ? l : 0;
+            int min = index1 > 0 ? ExtractNumber(timestamp, 0, index1) : 0;
+            int sec = index2 > 0 && index2 > index1 ? ExtractNumber(timestamp, index1 + 1, index2 - index1 - 1) : ExtractNumber(timestamp, index1 + 1, timestamp.Length - index1 - 1);
+            int ms = index2 > 0 ? ExtractNumber(timestamp, index2 + 1, timestamp.Length - index2 - 1) : 0;
 
             return new TimeSpan(0, 0, min, sec, ms);
+        }
+
+        private static int ExtractNumber(string str, int start, int length)
+        {
+            if (start < 0 || length < 1 || start + length > str.Length)
+                return 0;
+
+            int result = 0;
+            for (int i = start; i < start + length; i++)
+            {
+                if (char.IsDigit(str[i]))
+                    result = result * 10 + (str[i] - '0');
+                else
+                    return 0;
+            }
+            return result;
         }
 
         private static bool IsTimestamp(string str)

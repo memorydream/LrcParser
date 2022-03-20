@@ -8,7 +8,7 @@ namespace LrcParser.Tests
         [Fact]
         public void SortLyrics()
         {
-            var result = LyricParser.ParseSingleLine("[02:40.32][01:54.07][00:50.22]茶饭不思 呆呆的凝望着").SortByTimestamp();
+            var result = new LyricParser().ParseSingleLine("[02:40.32][01:54.07][00:50.22]茶饭不思 呆呆的凝望着").SortByTimestamp();
             var l1 = new string[]
             {
                 result[0].ToString(),
@@ -27,7 +27,7 @@ namespace LrcParser.Tests
         [Fact]
         public void SortLyricsCompNotSort()
         {
-            var result = LyricParser.ParseSingleLine("[02:40.32][01:54.07][00:50.22]茶饭不思 呆呆的凝望着");
+            var result = new LyricParser().ParseSingleLine("[02:40.32][01:54.07][00:50.22]茶饭不思 呆呆的凝望着");
             var l1 = new string[]
             {
                 result[0].ToString(),

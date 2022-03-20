@@ -8,14 +8,14 @@ public class LyricParseSingleLineTests
     [Fact]
     public void ParseSingeTimestamp()
     {
-        var result = LyricParser.ParseSingleLine("[03:03.67]最近少一个人好寂寞")[0];
+        var result = new LyricParser().ParseSingleLine("[03:03.67]最近少一个人好寂寞")[0];
         Assert.Equal("[03:03.67]最近少一个人好寂寞", result.ToString());
     }
 
     [Fact]
     public void ParseMultiTimestamp()
     {
-        var result = LyricParser.ParseSingleLine("[02:40.32][01:54.07][00:50.22]茶饭不思 呆呆的凝望着");
+        var result = new LyricParser().ParseSingleLine("[02:40.32][01:54.07][00:50.22]茶饭不思 呆呆的凝望着");
         var l1 = new string[] 
         {
             result[0].ToString(),
@@ -34,45 +34,45 @@ public class LyricParseSingleLineTests
     [Fact]
     public void ParseWithoutTimestamp()
     {
-        Assert.Null(LyricParser.ParseSingleLine("茶饭不思 呆呆的凝望着"));
+        Assert.Null(new LyricParser().ParseSingleLine("茶饭不思 呆呆的凝望着"));
     }
 
     [Fact]
     public void ParseWithOutContent()
     {
-        var result = LyricParser.ParseSingleLine("[03:03.67]")[0];
+        var result = new LyricParser().ParseSingleLine("[03:03.67]")[0];
         Assert.Equal("[03:03.67]", result.ToString());
     }
 
     [Fact]
     public void ParseFakeTimestampNumber()
     {
-        var result = LyricParser.ParseSingleLine("[03:03.67][123]qqaa")[0];
+        var result = new LyricParser().ParseSingleLine("[03:03.67][123]qqaa")[0];
         Assert.Equal("[123]qqaa", result.Content);
     }
 
     [Fact]
     public void ParseFakeTimestampString()
     {
-        var result = LyricParser.ParseSingleLine("[03:03.67][aa:bb.ccc]")[0];
+        var result = new LyricParser().ParseSingleLine("[03:03.67][aa:bb.ccc]")[0];
         Assert.Equal("[aa:bb.ccc]", result.Content);
     }
 
     [Fact]
     public void ParseEmpty()
     {
-        Assert.Null(LyricParser.ParseSingleLine(string.Empty));
+        Assert.Null(new LyricParser().ParseSingleLine(string.Empty));
     }
 
     [Fact]
     public void ParseNull()
     {
-        Assert.Null(LyricParser.ParseSingleLine(null));
+        Assert.Null(new LyricParser().ParseSingleLine(null));
     }
 
     [Fact]
     public void ParseWithoutMilliseconds()
     {
-        Assert.Equal("[02:40.0]最近少一个人好寂寞", LyricParser.ParseSingleLine("[02:40]最近少一个人好寂寞")[0].ToString());
+        Assert.Equal("[02:40.0]最近少一个人好寂寞", new LyricParser().ParseSingleLine("[02:40]最近少一个人好寂寞")[0].ToString());
     }
 }
