@@ -139,12 +139,10 @@ namespace LrcParser
             int index2 = timestampStr.IndexOf('.');
 
             int min = index1 > 0 && int.TryParse(timestampStr.Substring(0, index1), out int m) ? m : 0;
-
             int sec = index2 > 0 && index2 > index1
                 ? int.TryParse(timestampStr.Substring(index1 + 1, index2 - index1 - 1), out int s) ? s : 0
-                : int.TryParse(timestampStr.Substring(index1 + 1, timestampStr.Length - index1 - 1), out s) ? s : 9;
+                : int.TryParse(timestampStr.Substring(index1 + 1, timestampStr.Length - index1 - 1), out s) ? s : 0;
             int ms  = index2 > 0 && int.TryParse(timestampStr.Substring(index2 + 1, timestampStr.Length - index2 - 1), out int l) ? l : 0;
-
 
             return new TimeSpan(0, 0, min, sec, ms);
         }
@@ -160,7 +158,7 @@ namespace LrcParser
 
             for (int i = 0; i < index1; i++)
             {
-                if (str[i] < '0' || str[i] > '9')
+                if (!char.IsDigit(str[i]))
                     return false;
             }
 
@@ -168,7 +166,7 @@ namespace LrcParser
             {
                 for (int i = index1 + 1; i < len; i++)
                 {
-                    if (str[i] < '0' || str[i] > '9')
+                    if (!char.IsDigit(str[i]))
                         return false;
                 }
             }
@@ -176,13 +174,13 @@ namespace LrcParser
             {
                 for (int i = index1 + 1; i < index2; i++)
                 {
-                    if (str[i] < '0' || str[i] > '9')
+                    if (!char.IsDigit(str[i]))
                         return false;
                 }
 
                 for (int i = index2 + 1; i < len; i++)
                 {
-                    if (str[i] < '0' || str[i] > '9')
+                    if (!char.IsDigit(str[i]))
                         return false;
                 }
             }
