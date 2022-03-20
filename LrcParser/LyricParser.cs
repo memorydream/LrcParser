@@ -122,14 +122,37 @@ namespace LrcParser
 
         private static TimeSpan ParseTimestamp(string timestamp)
         {
-            int index1 = timestamp.IndexOf(':');
-            int index2 = timestamp.IndexOf('.');
+            var (index1, index2) = IndexOfTimestampSeparator(timestamp);
 
             int min = index1 > 0 ? ExtractNumber(timestamp, 0, index1) : 0;
-            int sec = index2 > 0 && index2 > index1 ? ExtractNumber(timestamp, index1 + 1, index2 - index1 - 1) : ExtractNumber(timestamp, index1 + 1, timestamp.Length - index1 - 1);
-            int ms = index2 > 0 ? ExtractNumber(timestamp, index2 + 1, timestamp.Length - index2 - 1) : 0;
+            int sec = ExtractNumber(timestamp, index1 + 1, (index2 > 0 ? index2 : timestamp.Length) - index1 - 1);
+            int ms  = index2 > 0 ? ExtractNumber(timestamp, index2 + 1, timestamp.Length - index2 - 1) : 0;
 
             return new TimeSpan(0, 0, min, sec, ms);
+        }
+
+        private static (int, int) IndexOfTimestampSeparator(string timestamp)
+        {
+            int index1 = -1;
+            int index2 = -1;
+
+            if (!string.IsNullOrEmpty(timestamp))
+            {
+                for (int i = 0; i < timestamp.Length; i++)
+                {
+                    if (timestamp[i] == ':')
+                    {
+                        index1 = i;
+                    }
+                    else if (timestamp[i] == '.')
+                    {
+                        index2 = i;
+                        break;
+                    }
+                }
+            }
+
+            return (index1, index2);
         }
 
         private static int ExtractNumber(string str, int start, int length)
@@ -151,10 +174,9 @@ namespace LrcParser
         private static bool IsTimestamp(string str)
         {
             int len = str.Length;
-            int index1 = str.IndexOf(':');
-            int index2 = str.IndexOf('.');
+            var (index1, index2) = IndexOfTimestampSeparator(str);
             
-            if (index1 == -1 || (index2 >= 0 && index2 <= index1))
+            if (index1 == -1)
                 return false;
 
             for (int i = 0; i < index1; i++)
